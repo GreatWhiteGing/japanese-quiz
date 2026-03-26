@@ -1,5 +1,6 @@
 import random
 import tkinter as tk
+import tkinter.messagebox as messagebox
 from data import *
 from score import save_score, show_history
 
@@ -7,24 +8,28 @@ selected = []
 current_char = None
 total_questions = 0
 score = 0
+label = ""
 
 def start_hiragana():
-    global selected
+    global selected, label
     selected = list(hiragana.items())
+    label = "Hiragana"
     menu_frame.pack_forget()
     quiz_frame.pack()
     next_question()
     
 def start_katakana():
-    global selected
+    global selected, label
     selected = list(katakana.items())
+    label = "Katakana"
     menu_frame.pack_forget()
     quiz_frame.pack()
     next_question()
 
 def start_both():
-    global selected
+    global selected, label
     selected = list(hiragana.items()) + list(katakana.items())
+    label = "Both"
     menu_frame.pack_forget()
     quiz_frame.pack()
     next_question()
@@ -32,13 +37,27 @@ def start_both():
 def quit_app():
     root.destroy()
 
+def quit_quiz():
+    global total_questions, score
+    if messagebox.askyesno("Save Progress", "Would you like to save your progress?"):
+        if total_questions > 0:
+            percentage = round((score / total_questions) * 100)
+            save_score(label, score, total_questions, percentage)
+    # reset score variables
+    total_questions = 0
+    score = 0
+    score_label.config(text="Score: 0/0")
+    # return to menu
+    quiz_frame.pack_forget()
+    menu_frame.pack()
+
 def check_answer():
     global total_questions, score
     result_label.config(text="")
     answer = answer_entry.get().lower()
     
     if answer == current_char[0]:
-        result_label.config(text="Correct!", fg="green")
+        result_label.config(text="Correct!", fg="green") 
         score += 1
     else:
         result_label.config(text=f"Incorrect! The answer was {current_char[0]}", fg="red")
@@ -67,14 +86,15 @@ submit_btn =tk.Button(quiz_frame, text="Submit", command=check_answer)
 result_label = tk.Label(quiz_frame, text="")
 score_label = tk.Label(quiz_frame, text="Score: 0/0")
 
-label = tk.Label(menu_frame, text="Japanese Quiz")
+menu_label = tk.Label(menu_frame, text="Japanese Quiz")
 btn_hiragana = tk.Button(menu_frame, text="1. Hiragana", command=start_hiragana)
 btn_katakana = tk.Button(menu_frame, text="2. Katakana", command=start_katakana)
 btn_both = tk.Button(menu_frame, text="3. Both", command=start_both)
 btn_quit = tk.Button(menu_frame, text="4. Quit", command=quit_app)
+quit_quiz_btn = tk.Button(quiz_frame, text="Quit", command=quit_quiz)
 
 # Menu widget packs
-label.pack()
+menu_label.pack()
 btn_hiragana.pack()
 btn_katakana.pack()
 btn_both.pack()
@@ -86,6 +106,7 @@ answer_entry.pack()
 submit_btn.pack()
 result_label.pack()
 score_label.pack()
+quit_quiz_btn.pack()
 
 menu_frame.pack()
 

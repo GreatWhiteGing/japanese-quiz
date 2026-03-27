@@ -36,3 +36,11 @@ def show_history():
         print("--- Recent Sessions ---")
         for entry in recent:
             print(f"{entry['date']} | {entry['practiced']} | {entry['score']}/{entry['total']} | ({entry['percentage']}%)\n")
+
+def load_history():
+    """Load and return session history from progress.json"""
+    try:
+        with open("progress.json", "r") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []

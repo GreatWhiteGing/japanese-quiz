@@ -2,7 +2,7 @@ import random
 import tkinter as tk
 import tkinter.messagebox as messagebox
 from data import *
-from score import save_score, show_history
+from score import save_score, load_history
 
 # --- Global Variables ---
 selected = []       # list of character tuples for the current quiz
@@ -12,6 +12,22 @@ score = 0           # correct answers this session
 label = ""          # tracks which mode was selected
 
 # --- Menu Functions ---
+def display_history():
+    """Load and display recent session history on the menu screen"""
+    # clear existing history labels to prevent duplicates
+    for widget in menu_frame.winfo_children():
+        if isinstance(widget, tk.Label) and widget != menu_label:
+            widget.destroy()
+    history = load_history()
+    if not history:
+        tk.Label(menu_frame, text="No recent sessions").pack()
+        return
+    
+    tk.Label(menu_frame, text="--- Recent Sessions ---").pack()
+    recent = history[-5:]
+    for entry in recent:
+        tk.Label(menu_frame, text=f"{entry['date']} | {entry['practiced']} | {entry['score']}/{entry['total']} ({entry['percentage']}%)").pack()
+
 def start_hiragana():
     """Set up hiragana quiz and transition to quiz screen"""
     global selected, label
@@ -58,6 +74,7 @@ def quit_quiz():
     # return to menu
     quiz_frame.pack_forget()
     menu_frame.pack()
+    display_history()   # refresh history when returning to menu
 
 def check_answer():
     """Check the user's answer and update the score"""
@@ -94,7 +111,7 @@ quiz_frame = tk.Frame(root)
 # --- Quiz Widgets ---
 char_label = tk.Label(quiz_frame, text="", font=("Arial", 48))
 answer_entry = tk.Entry(quiz_frame, width=20)
-answer_entry.bind("<Return>", lambda event: check_answer())
+answer_entry.bind("<Return>", lambda event: check_answer()) # submit on Enter key
 submit_btn =tk.Button(quiz_frame, text="Submit", command=check_answer)
 result_label = tk.Label(quiz_frame, text="")
 score_label = tk.Label(quiz_frame, text="Score: 0/0")
@@ -123,6 +140,7 @@ score_label.pack()
 quit_quiz_btn.pack()
 
 # Show menu frame on startup
+display_history()
 menu_frame.pack()
 
 # Start the tkinter event loop

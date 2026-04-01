@@ -2,7 +2,7 @@ import random
 import tkinter as tk
 import tkinter.messagebox as messagebox
 from data import *
-from score import save_score, load_history
+from score import save_score, load_history, load_vocab, save_vocab
 
 # --- Global Variables ---
 selected = []           # list of character tuples for the current quiz
@@ -55,6 +55,36 @@ def start_both():
     menu_frame.pack_forget()
     quiz_frame.pack()
     next_question()
+    
+def start_vocab_quiz():
+    """Start vocabulary quiz mode"""
+    pass
+
+def manage_vocab():
+    """Open vocabulary screen"""
+    menu_frame.pack_forget()
+    refresh_vocab_list()
+    vocab_frame.pack()
+    
+def refresh_vocab_list():
+    """Reload and display vocab entries in the listbox"""
+    vocab_listbox.delete(0, tk.END)
+    vocab = load_vocab()
+    for entry in vocab:
+        vocab_listbox.insert(tk.END, f"{entry['japanese']} | {entry['romaji']} | {entry['english']}")
+
+def add_vocab_word():
+    """Add a new word to the vocabulary list"""
+    pass
+
+def delete_vocab_word():
+    """Delete selected word from vocabulary list"""
+    pass
+
+def vocab_back_to_menu():
+    """Return to main menu from vocabulary screen"""
+    vocab_frame.pack_forget()
+    menu_frame.pack()
 
 def quit_app():
     """Close the application"""
@@ -130,6 +160,7 @@ root.geometry("400x300")
 menu_frame = tk.Frame(root)
 quiz_frame = tk.Frame(root)
 results_frame = tk.Frame(root)
+vocab_frame = tk.Frame(root)
 
 # --- Quiz Widgets ---
 char_label = tk.Label(quiz_frame, text="", font=("Arial", 48))
@@ -144,7 +175,9 @@ menu_label = tk.Label(menu_frame, text="Japanese Quiz")
 btn_hiragana = tk.Button(menu_frame, text="1. Hiragana", command=start_hiragana)
 btn_katakana = tk.Button(menu_frame, text="2. Katakana", command=start_katakana)
 btn_both = tk.Button(menu_frame, text="3. Both", command=start_both)
-btn_quit = tk.Button(menu_frame, text="4. Quit", command=quit_app)
+btn_vocab_quiz = tk.Button(menu_frame, text="4. Vocabulary Quiz", command=start_vocab_quiz)
+btn_manage_vocab = tk.Button(menu_frame, text="5. Manage Vocabulary", command=manage_vocab)
+btn_quit = tk.Button(menu_frame, text="6. Quit", command=quit_app)
 quit_quiz_btn = tk.Button(quiz_frame, text="Quit", command=quit_quiz)
 
 # -- Results Widgets ---
@@ -154,11 +187,38 @@ results_incorrect_label = tk.Label(results_frame, text="")
 results_chars_label = tk.Label(results_frame, text="", font=("Arial", 18))
 return_btn = tk.Button(results_frame, text="Return to Menu", command=return_to_menu)
 
+# --- Vocab widgets ---
+vocab_title = tk.Label(vocab_frame, text="Manage Vocabulary", font=("Arial", 16))
+
+# Input fields
+japanese_label = tk.Label(vocab_frame, text="Japanese:")
+japanese_entry = tk.Entry(vocab_frame, width=20)
+
+romaji_label = tk.Label(vocab_frame, text="Romaji:")
+romaji_entry = tk.Entry(vocab_frame, width=20)
+
+english_label = tk.Label(vocab_frame, text="English:")
+english_entry = tk.Entry(vocab_frame, width=20)
+
+# Buttons
+add_word_btn = tk.Button(vocab_frame, text="Add Word", command=add_vocab_word)
+delete_word_btn = tk. Button(vocab_frame, text="Delete Selected", command=delete_vocab_word)
+back_to_menu_btn = tk.Button(vocab_frame, text="Back to Menu", command=vocab_back_to_menu)
+
+# Listbox with scrollbar
+listbox_frame = tk.Frame(vocab_frame)
+vocab_listbox = tk.Listbox(listbox_frame, width=50, height=8)
+scrollbar = tk.Scrollbar(listbox_frame)
+vocab_listbox.config(yscrollcommand=scrollbar.set)
+scrollbar.config(command=vocab_listbox.yview)
+
 # --- Menu widget packs ---
 menu_label.pack()
 btn_hiragana.pack()
 btn_katakana.pack()
 btn_both.pack()
+btn_vocab_quiz.pack()
+btn_manage_vocab.pack()
 btn_quit.pack()
 
 # --- Quiz widget packs ---
@@ -175,6 +235,21 @@ results_score_label.pack()
 results_incorrect_label.pack()
 results_chars_label.pack()
 return_btn.pack()
+
+# --- Vocab widget pack ---
+vocab_title.pack()
+japanese_label.pack()
+japanese_entry.pack()
+romaji_label.pack()
+romaji_entry.pack()
+english_label.pack()
+english_entry.pack()
+add_word_btn.pack()
+listbox_frame.pack()
+vocab_listbox.pack(side=tk.LEFT)
+scrollbar.pack(side=tk.LEFT, fill=tk.Y)
+delete_word_btn.pack()
+back_to_menu_btn.pack()
 
 # Show menu frame on startup
 display_history()

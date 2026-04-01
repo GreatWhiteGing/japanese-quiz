@@ -44,3 +44,16 @@ def load_history():
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return []
+
+def load_vocab():
+    """Load custom vocabulary from vocab.json"""
+    try:
+        with open("vocab.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+    
+def save_vocab(vocab_list):
+    """Save custom vocabulary to vocab.json"""
+    with open("vocab.json", "w", encoding="utf-8") as f:
+        json.dump(vocab_list, f, indent=4, ensure_ascii=False)

@@ -75,11 +75,49 @@ def refresh_vocab_list():
 
 def add_vocab_word():
     """Add a new word to the vocabulary list"""
-    pass
-
+    japanese = japanese_entry.get()
+    romaji = romaji_entry.get()
+    english = english_entry.get()
+    
+    if not japanese or not romaji or not english:
+        messagebox.showwarning("Missing Fields", "Please fill in all fields")
+        return
+    
+    # load existing vocab, add new entry, save back
+    vocab = load_vocab()
+    vocab.append({
+        "japanese": japanese,
+        "romaji": romaji,
+        "english": english
+    })
+    save_vocab(vocab)
+    
+    # clear entry fields
+    japanese_entry.delete(0, tk.END)
+    romaji_entry.delete(0, tk.END)
+    english_entry.delete(0, tk.END)
+    
+    # refresh the listbox
+    refresh_vocab_list()
+    
 def delete_vocab_word():
     """Delete selected word from vocabulary list"""
-    pass
+    selected_index = vocab_listbox.curselection()
+    
+    if not selected_index:
+        messagebox.showwarning("No Selection", "Please select a word to delete")
+        return
+    
+    # get the index number from the tuple
+    index = selected_index[0]
+    
+    # load vocab, remove the item at that index, save back
+    vocab = load_vocab()
+    vocab.pop(index)
+    save_vocab(vocab)
+    
+    # refresh the listbox
+    refresh_vocab_list()
 
 def vocab_back_to_menu():
     """Return to main menu from vocabulary screen"""
@@ -154,7 +192,7 @@ def return_to_menu():
 # --- Window Setup ---
 root = tk.Tk()
 root.title("Japanese Quiz")
-root.geometry("400x300")
+root.geometry("400x500")
 
 # --- Frames ---
 menu_frame = tk.Frame(root)
